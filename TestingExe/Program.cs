@@ -26,10 +26,10 @@ namespace TestingExe
             PluginImpl plugin = new PluginImpl();
 
             var authResult = plugin.AuthenticateUser(properties);
-            Debug.Assert(authResult.Success == true, "auth should succeed!");
+            Debug.Assert(authResult.Success == true, authResult.Message);
 
             var gatewayResult = plugin.AuthenticatedUserGateway(properties);
-            Debug.Assert(authResult.Success == true, "gateway should succeed!");
+            Debug.Assert(gatewayResult.Success == true, gatewayResult.Message);
 
             System.Console.Write("DONE");
         }
