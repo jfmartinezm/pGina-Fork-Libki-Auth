@@ -6,6 +6,7 @@ using System.IO;
 using pGina.Shared.Types;
 using log4net;
 using System.Text;
+using Newtonsoft.Json.Linq;
 
 namespace pGina.Plugin.LibkiAuth
 {
@@ -28,10 +29,11 @@ namespace pGina.Plugin.LibkiAuth
                 request.Method = "POST";
                 request.Timeout = 2000;
                 // Create POST data and convert it to a byte array.
-                string postData = "{\"username\":\"" + uname + "\",\"password\":\"" + pwd + "\"}";
+                string postData = "username=" + uname + "&password=" + pwd +
+                    "&action=login&node=FJ0200311181200&location=Laboratorio&type=&createGuest=0";
                 byte[] byteArray = Encoding.UTF8.GetBytes(postData);
                 // Set the ContentType property of the WebRequest.
-                request.ContentType = "application/json";
+                request.ContentType = "application/x-www-form-urlencoded";
                 // Set the ContentLength property of the WebRequest.
                 request.ContentLength = byteArray.Length;
 
@@ -52,12 +54,38 @@ namespace pGina.Plugin.LibkiAuth
                             string responseFromServer = reader.ReadToEnd();
                             // Display the content.
                             m_logger.InfoFormat("Response: {0}", responseFromServer);
+                            /*
                             // save it for later use
                             if (resps.ContainsKey(uname))
                             {
                                 resps.Remove(uname);
                             }
                             resps.Add(uname, UInfo.parseResponse(responseFromServer));
+                            */
+
+                            var authenticated = JObject.Parse(responseFromServer)["authenticated"];
+                            if (authenticated == null)
+                            {
+                                // Authenticated property not found, check error condition
+                                var error = JObject.Parse(responseFromServer)["error"];
+                                if (error == null)
+                                {
+                                    // Bad response format, should not happen
+                                    throw new Exception("Bad response format: " + responseFromServer);
+                                }
+                                else 
+                                {
+                                    throw new WebException("User not authenticated: " + error.ToString());
+                                }
+                            }
+                            else
+                            {
+                                if (!authenticated.ToString().Equals("1"))
+                                {
+                                    // Authenticated property exists, but it is not 1 (unsupported case)
+                                    throw new Exception("Authentication error: " + authenticated.ToString());
+                                }
+                            }
                         }
                     }
                 }
