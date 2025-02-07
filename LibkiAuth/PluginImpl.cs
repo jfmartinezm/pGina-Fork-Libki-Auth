@@ -15,7 +15,7 @@ namespace pGina.Plugin.LibkiAuth
         #region Init-plugin
         public static Guid PluginUuid
         {
-            get { return new Guid("{C4FF794F-5843-4BEF-90BA-B5E4E488C662}"); }
+            get { return new Guid("{123C9161-AD2B-4E2C-AFCD-A36BC2B763A7}"); }
         }
 
         public PluginImpl()
