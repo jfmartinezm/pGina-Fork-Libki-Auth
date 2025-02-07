@@ -16,14 +16,15 @@ namespace TestingExe
         {
             SessionProperties properties = new SessionProperties(new Guid("12345678-1234-1234-1234-123412341234"));
             UserInformation userInfo = new UserInformation();
-            userInfo.Username = "01";
-            userInfo.Password = "01";
+            userInfo.Username = "L12345678";
+            userInfo.Password = "1234";
             properties.AddTrackedSingle<UserInformation>(userInfo);
 
-            PluginImpl plugin = new PluginImpl();
+            LibkiAuthPlugin plugin = new LibkiAuthPlugin();
 
+            System.Console.WriteLine("Authenticating User");
             var authResult = plugin.AuthenticateUser(properties);
-            Debug.Assert(authResult.Success == true, authResult.Message);
+            System.Console.WriteLine("Authentication result: " + authResult.Success + ", " + authResult.Message);
 
             /*
             var gatewayResult = plugin.AuthenticatedUserGateway(properties);

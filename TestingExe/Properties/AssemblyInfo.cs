@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("HttpAuth TestingExe")]
-[assembly: AssemblyDescription("github vencax")]
+[assembly: AssemblyTitle("LibkiAuth TestingExe")]
+[assembly: AssemblyDescription("LibkiAuth testing app")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("TestingExe")]
-[assembly: AssemblyCopyright("Copyright © Václav Klecanda 2017")]
+[assembly: AssemblyCopyright("Copyright © Jesús Martínez 2025")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

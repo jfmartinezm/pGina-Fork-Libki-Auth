@@ -69,8 +69,18 @@ namespace pGina.Plugin.LibkiAuth
         {
             // this method shall say if our credentials are valid
             UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
+            m_logger.DebugFormat("LibkiAuth: Authenticate user {0}", userInfo.Username);
 
-            return HttpAccessor.getResponse(userInfo.Username, userInfo.Password);
+            BooleanResult result = LibkiClientAPI.registerNode();
+            m_logger.DebugFormat("LibkiAuth: Node registration result: {0}, {1}", result.Success, result.Message);
+
+            if (result.Success)
+            {
+                result = LibkiClientAPI.login(userInfo.Username, userInfo.Password);
+                m_logger.DebugFormat("LibkiAuth: Authentication result: {0}, {1}", result.Success, result.Message);
+            }
+
+            return result;
         }
 
     }
