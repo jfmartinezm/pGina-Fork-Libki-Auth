@@ -2,26 +2,30 @@
 using System.DirectoryServices.AccountManagement;
 using System.Diagnostics;
 
+using log4net;
+
 using pGina.Shared.Interfaces;
 using pGina.Shared.Types;
-using log4net;
+using pGina.Shared.Settings;
 
 namespace pGina.Plugin.LibkiAuth
 {
-    public class PluginImpl : IPluginConfiguration, IPluginAuthentication, IPluginAuthenticationGateway, IPluginChangePassword
+    public class LibkiAuthPlugin : IPluginConfiguration, IPluginAuthentication
     {
         private static ILog m_logger = LogManager.GetLogger("LibkiAuth");
+        public static Guid PluginUuid = new Guid("{123C9161-AD2B-4E2C-AFCD-A36BC2B763A7}");
+        private string m_defaultDescription = "Plugin for Libki user authentication and authorization";
+        private dynamic m_settings = null;
 
         #region Init-plugin
-        public static Guid PluginUuid
-        {
-            get { return new Guid("{123C9161-AD2B-4E2C-AFCD-A36BC2B763A7}"); }
-        }
 
-        public PluginImpl()
+        public LibkiAuthPlugin()
         {
             using (Process me = Process.GetCurrentProcess())
             {
+                m_settings = new pGinaDynamicSettings(PluginUuid);
+                m_settings.SetDefault("ShowDescription", true);
+                m_settings.SetDefault("Description", m_defaultDescription);
                 m_logger.DebugFormat("Plugin initialized on {0} in PID: {1} Session: {2}", Environment.MachineName, me.Id, me.SessionId);
             }
         }
@@ -33,12 +37,7 @@ namespace pGina.Plugin.LibkiAuth
 
         public string Description
         {
-            get { return "Uses http(s) request to obtain user info"; }
-        }
-
-        public Guid Uuid
-        {
-            get { return PluginUuid; }
+            get { return m_settings.Description; }
         }
 
         public string Version
@@ -48,6 +47,12 @@ namespace pGina.Plugin.LibkiAuth
                 return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
             }
         }
+
+        public Guid Uuid
+        {
+            get { return PluginUuid; }
+        }
+
         #endregion
 
         public void Starting() { }
@@ -68,46 +73,5 @@ namespace pGina.Plugin.LibkiAuth
             return HttpAccessor.getResponse(userInfo.Username, userInfo.Password);
         }
 
-        public BooleanResult AuthenticatedUserGateway(SessionProperties properties)
-        {
-            // this method shall perform some other tasks ...
-
-            UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
-
-            UInfo uinfo = HttpAccessor.getUserInfo(userInfo.Username);
-            if (uinfo != null)
-            {
-                m_logger.DebugFormat("AuthenticatedUserGateway: Uinfo: {0}", uinfo.ToString());
-                foreach (string group in uinfo.groups)
-                {
-                    userInfo.AddGroup(new GroupInformation() { Name = group });
-                }
-                properties.AddTrackedSingle<UserInformation>(userInfo);
-
-                // and what else ??? :)
-                
-            }
-
-            return new BooleanResult() { Success = true };
-        }
-
-        public BooleanResult ChangePassword(SessionProperties properties, ChangePasswordPluginActivityInfo pluginInfo)
-        {
-            UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
-
-            m_logger.DebugFormat("ChangePassword(): {0}", userInfo.ToString());
-
-            // Verify the old password
-            if (Abstractions.WindowsApi.pInvokes.ValidateCredentials(userInfo.Username, userInfo.oldPassword))
-            {
-                m_logger.DebugFormat("Authenticated via old password: {0}", userInfo.Username);
-            }
-            else
-            {
-                return new BooleanResult { Success = false, Message = "Current password or username is not valid." };
-            }
-
-            return HttpAccessor.getPwChangeResponse(userInfo.Username, userInfo.Password, userInfo.oldPassword);
-        }
     }
 }

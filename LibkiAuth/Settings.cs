@@ -12,7 +12,7 @@ namespace pGina.Plugin.LibkiAuth
 {
     class Settings
     {
-        private static dynamic m_settings = new pGinaDynamicSettings(PluginImpl.PluginUuid);
+        private static dynamic m_settings = new pGinaDynamicSettings(LibkiAuthPlugin.PluginUuid);
         private static ILog m_logger = LogManager.GetLogger("HttpAuthSettings");
         private static string DEFAULT_URL = "https://pginaloginserver/login";
 
