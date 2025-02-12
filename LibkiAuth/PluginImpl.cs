@@ -71,6 +71,15 @@ namespace pGina.Plugin.LibkiAuth
             UserInformation userInfo = properties.GetTrackedSingle<UserInformation>();
             m_logger.DebugFormat("LibkiAuth: Authenticate user {0}", userInfo.Username);
 
+            m_logger.DebugFormat("LibkiAuth: Parsing INI data from {0}", Settings.Store.INIFilePath);
+            int iniDataParseError = Settings.loadSettingsFromIni();
+
+            m_logger.DebugFormat("LibkiAuth: Parsing data result: {0}", iniDataParseError);
+            m_logger.DebugFormat("LibkiAuth: Server settings: scheme {0}, host {1}, port {2}",
+                Settings.Store.ServerScheme, Settings.Store.ServerHost, Settings.Store.ServerPort);
+            m_logger.DebugFormat("LibkiAuth: Node settings: name {0}, location {1}, type {2}",
+                Settings.Store.NodeName, Settings.Store.NodeLocation, Settings.Store.NodeType);
+
             BooleanResult result = LibkiClientAPI.registerNode();
             m_logger.DebugFormat("LibkiAuth: Node registration result: {0}, {1}", result.Success, result.Message);
 
